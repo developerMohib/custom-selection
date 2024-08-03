@@ -1,35 +1,84 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import PropTypes from "prop-types";
+import "./App.css";
+import { useState } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+const CustomSelect = ({
+  isClearable,
+  isSearchable,
+  isDisabled,
+  options,
+  value,
+  placeholder,
+  isGrouped,
+  isMulti,
+  onChangeHandler,
+  onMenuOpen,
+  onSearchHandler,
+}) => {
+  options = [
+    "Pick your favorite language",
+    "Java",
+    "Go",
+    "C",
+    "C#",
+    "C++",
+    "Rust",
+    "JavaScript",
+    "Python"
+  ];
+  const [select, setSelect] = useState("");
+  console.log("select", select);
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+      <select
+    onChange={(e) => setSelect(e.target.value)}
+    className="kzui-select-option"
+  >
+    {options.map((language, index) => (
+      <option key={index} value={language}>
+        {language}
+      </option>
+    ))}
+  </select>
 
-export default App
+      <div className="kzui-checkbox">
+        <label className="kzui-cursor">
+          <input type="checkbox" className="" />
+          <span className="">Clearable</span>
+        </label>
+        <label className="kzui-cursor">
+          <input type="checkbox" className="" />
+          <span className="">Searchable</span>
+        </label>
+        <label className="kzui-cursor">
+          <input type="checkbox" className="" />
+          <span className="">Disabled</span>
+        </label>
+        <label className="kzui-cursor">
+          <input type="checkbox" className="" />
+          <span className="">Grouped</span>
+        </label>
+        <label className="kzui-cursor">
+          <input type="checkbox" className="" />
+          <span className="">Multi</span>
+        </label>
+      </div>
+    </>
+  );
+};
+CustomSelect.propTypes = {
+  isClearable: PropTypes.bool,
+  isSearchable: PropTypes.bool,
+  isDisabled: PropTypes.bool,
+  options: PropTypes.array,
+  value: PropTypes.string,
+  placeholder: PropTypes.string,
+  isGrouped: PropTypes.bool,
+  isMulti: PropTypes.bool,
+  onChangeHandler: PropTypes.func,
+  onMenuOpen: PropTypes.func,
+  onSearchHandler: PropTypes.func,
+};
+
+export default CustomSelect;
