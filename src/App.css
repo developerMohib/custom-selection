@@ -1,21 +1,33 @@
 body{
-  background-color: slategray;
+  background-color: rgba(112, 128, 144, 0.527);
+  display: flex;
+  place-items: center;
+  justify-content: center;
+  min-height:100vh;
+  margin: 0;
 }
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-  background-color: #fafafa;
-  border-radius: 4px;
+
+
+.kzui-select-div{
+  position: relative;
 }
-.kzui-select-option{
-  width: 100%;
-  padding: 10px;
+.kzui-select__clear{
+  cursor: pointer;
+  position: absolute;
+  right: 5%;
+  top: 25%;
+  background-color: white;
 }
 .kzui-cursor{
   cursor: pointer;
   margin: 0px 5px;
+  background-color: transparent;
+}
+
+
+.kzui-select-option{
+  width: 100%;
+  padding: 10px;
 }
 .kzui-checkbox{
   padding:10px 0px;

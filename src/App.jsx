@@ -8,7 +8,7 @@ const CustomSelect = ({
   isDisabled,
   options,
   value,
-  placeholder,
+  placeholder = "Search...",
   isGrouped,
   isMulti,
   onChangeHandler,
@@ -24,49 +24,99 @@ const CustomSelect = ({
     "C++",
     "Rust",
     "JavaScript",
-    "Python"
+    "Python",
   ];
   const [select, setSelect] = useState("");
-  console.log("select", select);
+  const [clear, setClear] = useState(false);
+  const [disabled, setDisabled] = useState(false);
+  const [searchable, setSearchable] = useState(false);
+  const [searchText, setSearchText] = useState('');
+
+
+  onChangeHandler = () => {
+    console.log("handler");
+    setSearchable(true)
+  };
+  const handleSelect =(e)=>{
+    setSelect(e.target.value)
+  }
+  const handleClearable = (e) => {
+    setClear(e.target.checked);
+  };
+  
+  const handleClear = () => {
+    console.log("clear koro");
+  };
+  const handleDisabled = (e) => {
+    setDisabled(e.target.checked);
+  };
 
   return (
     <>
-      <select
-    onChange={(e) => setSelect(e.target.value)}
-    className="kzui-select-option"
-  >
-    {options.map((language, index) => (
-      <option key={index} value={language}>
-        {language}
-      </option>
-    ))}
-  </select>
+      <div className="kzui-select-div">
+        <select
+          disabled={disabled}
+          onChange={handleSelect}
+          className="kzui-select-option"
+        >
+          {options.map((language, index) => (
+            <option key={index} value={language}>
+              {language}
+            </option>
+          ))}
+        </select>
+        {clear && (
+          <button
+            disabled={disabled}
+            onClick={handleClear}
+            className="kzui-select__clear"
+          >
+            X
+          </button>
+        )}
+      </div>
+      {/* Is searchable */}
+      <div>
+        
+          {searchable && (
+            <input
+              type="text"
+              className="kzui-select__search"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+          )}
+        
+      </div>
+
+      {/* Here these check box for making command */}
 
       <div className="kzui-checkbox">
         <label className="kzui-cursor">
-          <input type="checkbox" className="" />
+          <input onClick={handleClearable} type="checkbox" />
           <span className="">Clearable</span>
         </label>
         <label className="kzui-cursor">
-          <input type="checkbox" className="" />
+          <input onClick={onChangeHandler} type="checkbox" className="" />
           <span className="">Searchable</span>
         </label>
         <label className="kzui-cursor">
-          <input type="checkbox" className="" />
+          <input onClick={handleDisabled} type="checkbox" className="" />
           <span className="">Disabled</span>
         </label>
         <label className="kzui-cursor">
-          <input type="checkbox" className="" />
+          <input onClick={onChangeHandler} type="checkbox" className="" />
           <span className="">Grouped</span>
         </label>
         <label className="kzui-cursor">
-          <input type="checkbox" className="" />
+          <input onClick={onChangeHandler} type="checkbox" className="" />
           <span className="">Multi</span>
         </label>
       </div>
     </>
   );
 };
+
 CustomSelect.propTypes = {
   isClearable: PropTypes.bool,
   isSearchable: PropTypes.bool,
