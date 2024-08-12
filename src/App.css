@@ -16,7 +16,8 @@ body{
   position: absolute;
   right: 5%;
   top: 25%;
-  background-color: white;
+  background-color: transparent;
+  border: none;
 }
 .kzui-cursor{
   cursor: pointer;

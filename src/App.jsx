@@ -30,22 +30,23 @@ const CustomSelect = ({
   const [clear, setClear] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [searchable, setSearchable] = useState(false);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
 
-
+  console.log("select ", select);
   onChangeHandler = () => {
     console.log("handler");
-    setSearchable(true)
+    setSearchable(true);
   };
-  const handleSelect =(e)=>{
-    setSelect(e.target.value)
-  }
+  const handleSelect = (e) => {
+    setSelect(e.target.value);
+  };
   const handleClearable = (e) => {
     setClear(e.target.checked);
   };
-  
+
   const handleClear = () => {
-    console.log("clear koro");
+    setSelect(" ");
   };
   const handleDisabled = (e) => {
     setDisabled(e.target.checked);
@@ -54,17 +55,23 @@ const CustomSelect = ({
   return (
     <>
       <div className="kzui-select-div">
-        <select
-          disabled={disabled}
-          onChange={handleSelect}
-          className="kzui-select-option"
-        >
-          {options.map((language, index) => (
-            <option key={index} value={language}>
-              {language}
-            </option>
-          ))}
-        </select>
+      <select
+            disabled={disabled}
+            value={select}
+            onChange={handleSelect}
+            className="kzui-select-option"
+          >
+            {options.map((language, index) => (
+              <option
+                key={index}
+                value={
+                  language === "Pick your favorite language" ? " " : language
+                }
+              >
+                {language === "Pick your favorite language" ? placeholder : language}
+              </option>
+            ))}
+          </select>
         {clear && (
           <button
             disabled={disabled}
@@ -76,8 +83,8 @@ const CustomSelect = ({
         )}
       </div>
       {/* Is searchable */}
-      <div>
-        
+      {isOpen && (
+        <div className="kzui-select__menu">
           {searchable && (
             <input
               type="text"
@@ -86,8 +93,8 @@ const CustomSelect = ({
               onChange={(e) => setSearchText(e.target.value)}
             />
           )}
-        
-      </div>
+        </div>
+      )}
 
       {/* Here these check box for making command */}
 
@@ -102,7 +109,7 @@ const CustomSelect = ({
         </label>
         <label className="kzui-cursor">
           <input onClick={handleDisabled} type="checkbox" className="" />
-          <span className="">Disabled</span>
+          <span className="">Disabled </span>
         </label>
         <label className="kzui-cursor">
           <input onClick={onChangeHandler} type="checkbox" className="" />
