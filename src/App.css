@@ -25,7 +25,9 @@ body{
   background-color: transparent;
 }
 
-
+.kzui-input-over{
+  overflow-x: hidden;
+}
 .kzui-select-option{
   width: 100%;
   padding: 10px;
