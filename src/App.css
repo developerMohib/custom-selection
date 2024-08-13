@@ -35,3 +35,16 @@ body{
 .kzui-checkbox{
   padding:10px 0px;
 }
+
+.kzui-language-sugges{
+  position: absolute;
+  left: 1px;
+  top: 60%;
+  background-color: white;
+  width: 91%;
+  list-style-type: none;
+}
+.kzui-list-search{
+  padding: 5px 0px;
+  cursor: pointer;
+}

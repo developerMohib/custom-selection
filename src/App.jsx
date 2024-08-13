@@ -27,52 +27,69 @@ const CustomSelect = ({
     "Python",
   ];
 
-  const [select, setSelect] = useState("");
+  const [select, setSelect] = useState('');
   const [clear, setClear] = useState(false);
   const [searchable, setSearchable] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [match, setMatch] = useState([]);
   const [group, setGroup] = useState(false);
-
-  const handleSelect = (e) => {
-    setSelect(e.target.value);
-  };
 
   const handleClearable = (e) => {
     setClear(e.target.checked);
   };
 
   const handleSearch = (e) => {
-    setSearchText(e.target.value);
-    console.log('check ', e.target.value)
+    const value = e.target.value;
+    setSearchText(value);
+    if(value){
+      const filtered = options?.filter((option) =>
+        option.toLowerCase().includes(value.toLowerCase())
+      );
+      setMatch(filtered);
+    }else{
+      setMatch([])
+    }
+  };
+  const handleSelect = (e) => {
+    setSelect(e);
+    setSearchText(e)
+    setMatch([])
   };
 
   const handleClear = () => {
     setSelect(" ");
-    setSearchText('')
+    setSearchText("");
   };
 
-  console.log('group ', group)
+  console.log("group ", group);
 
   return (
     <>
       <div className="kzui-select-div">
         <div className="kzui-input-over">
           {searchable ? (
-            <input
-              type="text"
-              disabled={disabled}
-              className="kzui-select-option"
-              value={searchText}
-              placeholder={placeholder}
-              onChange={handleSearch}
-            />
+            <div>
+              <input
+                type="text"
+                disabled={disabled}
+                className="kzui-select-option"
+                value={searchText}
+                placeholder={placeholder}
+                onChange={handleSearch}
+              />
+              <ul className="kzui-language-sugges">
+                  {match?.map((language, index) => (
+                    <li className="kzui-list-search" onClick={()=>handleSelect(language)} key={index}>{language}</li>
+                  ))}
+                </ul>
+            </div>
           ) : (
             <select
               className="kzui-select-option"
               value={select}
               disabled={disabled}
-              onChange={handleSelect}
+              onChange={(e)=>setSelect(e.target.value)}
             >
               {options.map((language, index) => (
                 <option
