@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import "./App.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const CustomSelect = ({
   isClearable,
@@ -27,35 +27,44 @@ const CustomSelect = ({
     "Python",
   ];
 
-  const [select, setSelect] = useState('');
+  const [select, setSelect] = useState("");
   const [clear, setClear] = useState(false);
   const [searchable, setSearchable] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [match, setMatch] = useState([]);
+
   const [group, setGroup] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
 
   const handleClearable = (e) => {
     setClear(e.target.checked);
   };
+  const filtered = options?.filter((option) =>
+    option.toLowerCase().includes(searchText.toLowerCase())
+  );
 
-  const handleSearch = (e) => {
-    const value = e.target.value;
-    setSearchText(value);
-    if(value){
-      const filtered = options?.filter((option) =>
-        option.toLowerCase().includes(value.toLowerCase())
-      );
-      setMatch(filtered);
-    }else{
-      setMatch([])
-    }
+  const handleSelect = (language) => {
+    setSearchText(language);
+    setShowOptions(false);
   };
-  const handleSelect = (e) => {
-    setSelect(e);
-    setSearchText(e)
-    setMatch([])
-  };
+
+
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".dropdown-container")) {
+        setShowOptions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+
+
+
 
   const handleClear = () => {
     setSelect(" ");
@@ -76,20 +85,32 @@ const CustomSelect = ({
                 className="kzui-select-option"
                 value={searchText}
                 placeholder={placeholder}
-                onChange={handleSearch}
+                onChange={(e) => {
+                  setSearchText(e.target.value);
+                  setShowOptions(true);
+                }}
+                onClick={() => setShowOptions(true)}
               />
-              <ul className="kzui-language-sugges">
-                  {match?.map((language, index) => (
-                    <li className="kzui-list-search" onClick={()=>handleSelect(language)} key={index}>{language}</li>
+              {showOptions && filtered?.length > 0 && (
+                <ul className="kzui-language-sugges">
+                  {filtered?.map((language, index) => (
+                    <li
+                      className="kzui-list-search"
+                      onClick={() => handleSelect(language)}
+                      key={index}
+                    >
+                      {language}
+                    </li>
                   ))}
                 </ul>
+              )}
             </div>
           ) : (
             <select
               className="kzui-select-option"
               value={select}
               disabled={disabled}
-              onChange={(e)=>setSelect(e.target.value)}
+              onChange={(e) => setSelect(e.target.value)}
             >
               {options.map((language, index) => (
                 <option
