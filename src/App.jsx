@@ -26,20 +26,22 @@ const CustomSelect = ({
     "JavaScript",
     "Python",
   ];
-  const [select, setSelect] = useState("");
 
+  const [select, setSelect] = useState("");
   const [clear, setClear] = useState(false);
   const [searchable, setSearchable] = useState(false);
   const [disabled, setDisabled] = useState(false);
-
   const [searchText, setSearchText] = useState("");
+  const [group, setGroup] = useState(false);
 
   const handleSelect = (e) => {
     setSelect(e.target.value);
   };
+
   const handleClearable = (e) => {
     setClear(e.target.checked);
   };
+
   const handleSearch = (e) => {
     setSearchText(e.target.value);
     console.log('check ', e.target.value)
@@ -50,6 +52,8 @@ const CustomSelect = ({
     setSearchText('')
   };
 
+  console.log('group ', group)
+
   return (
     <>
       <div className="kzui-select-div">
@@ -58,7 +62,7 @@ const CustomSelect = ({
             <input
               type="text"
               disabled={disabled}
-              className=" kzui-select-option"
+              className="kzui-select-option"
               value={searchText}
               placeholder={placeholder}
               onChange={handleSearch}
@@ -87,7 +91,7 @@ const CustomSelect = ({
         </div>
         {clear && (
           <button
-          disabled={disabled}
+            disabled={disabled}
             onClick={handleClear}
             className="kzui-select__clear kzui-select__control"
           >
@@ -95,37 +99,32 @@ const CustomSelect = ({
           </button>
         )}
       </div>
-
-      {/* Here these check box for making command */}
-
       <div className="kzui-checkbox">
         <label className="kzui-cursor">
           <input onClick={handleClearable} type="checkbox" />
-          <span className="">Clearable</span>
+          <span>Clearable</span>
         </label>
         <label className="kzui-cursor">
           <input
             onClick={(e) => setSearchable(e.target.checked)}
             type="checkbox"
-            className=""
           />
-          <span className="">Searchable</span>
+          <span>Searchable</span>
         </label>
         <label className="kzui-cursor">
           <input
             onClick={(e) => setDisabled(e.target.checked)}
             type="checkbox"
-            className=""
           />
-          <span className="">Disabled </span>
+          <span>Disabled</span>
         </label>
         <label className="kzui-cursor">
-          <input onClick={onChangeHandler} type="checkbox" className="" />
-          <span className="">Grouped</span>
+          <input onClick={(e) => setGroup(e.target.checked)} type="checkbox" />
+          <span>Grouped</span>
         </label>
         <label className="kzui-cursor">
-          <input onClick={onChangeHandler} type="checkbox" className="" />
-          <span className="">Multi</span>
+          <input onClick={onChangeHandler} type="checkbox" />
+          <span>Multi</span>
         </label>
       </div>
     </>
