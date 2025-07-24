@@ -27,6 +27,7 @@ body{
 
 .kzui-input-over{
   overflow-x: hidden;
+  cursor: pointer;
 }
 .kzui-select-option{
   width: 100%;
@@ -46,5 +47,9 @@ body{
 }
 .kzui-list-search{
   padding: 5px 0px;
+  margin: 0px;
   cursor: pointer;
+}
+.kzui-list-search:hover{
+background-color: rgb(100, 98, 255);
 }

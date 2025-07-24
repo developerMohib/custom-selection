@@ -4,19 +4,18 @@ import { useEffect, useState } from "react";
 
 const CustomSelect = ({
   isClearable,
-  isSearchable,
+  isSearchable = false,
   isDisabled,
   options,
   value,
-  placeholder = "Search...",
+  placeholder = "select",
   isGrouped,
   isMulti,
   onChangeHandler,
   onMenuOpen,
   onSearchHandler,
 }) => {
-  options = [
-    "Pick your favorite language",
+  const defaultOptions = [
     "Java",
     "Go",
     "C",
@@ -26,29 +25,34 @@ const CustomSelect = ({
     "JavaScript",
     "Python",
   ];
+  const finalOptions = options?.length ? options : defaultOptions;
+
 
   const [select, setSelect] = useState("");
-  const [clear, setClear] = useState(false);
-  const [searchable, setSearchable] = useState(false);
-  const [disabled, setDisabled] = useState(false);
   const [searchText, setSearchText] = useState("");
 
-  const [group, setGroup] = useState(false);
+  const [clear, setClear] = useState(isClearable ?? false);
+  const [searchable, setSearchable] = useState(isSearchable ?? false);
+  const [disabled, setDisabled] = useState(isDisabled ?? false);
+  const [group, setGroup] = useState(isGrouped ?? false);
+  const [multi, setMulti] = useState(isMulti ?? false);
+
+
   const [showOptions, setShowOptions] = useState(false);
 
   const handleClearable = (e) => {
     setClear(e.target.checked);
   };
-  const filtered = options?.filter((option) =>
+  const filtered = finalOptions?.filter((option) =>
     option.toLowerCase().includes(searchText.toLowerCase())
   );
 
   const handleSelect = (language) => {
     setSearchText(language);
+    setSelect(language)
+    console.log('select language', language)
     setShowOptions(false);
   };
-
-
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -62,17 +66,15 @@ const CustomSelect = ({
     };
   }, []);
 
-
-
-
-
   const handleClear = () => {
     setSelect(" ");
     setSearchText("");
   };
 
-  console.log("group ", group);
-
+  console.log("select ", select);
+  console.log("searchable ", searchable);
+  console.log("searchText ", searchText);
+  console.log('select language', select)
   return (
     <>
       <div className="kzui-select-div">
@@ -81,6 +83,7 @@ const CustomSelect = ({
             <div>
               <input
                 type="text"
+                name="search"
                 disabled={disabled}
                 className="kzui-select-option"
                 value={searchText}
@@ -93,13 +96,20 @@ const CustomSelect = ({
               />
               {showOptions && filtered?.length > 0 && (
                 <ul className="kzui-language-sugges">
-                  {filtered?.map((language, index) => (
+                  {filtered.map((language) => (
                     <li
+                      key={language} // assuming language is unique
                       className="kzui-list-search"
                       onClick={() => handleSelect(language)}
-                      key={index}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          handleSelect(language);
+                        }
+                      }}
                     >
-                      {language}
+                      {language} helloe
                     </li>
                   ))}
                 </ul>
@@ -107,24 +117,23 @@ const CustomSelect = ({
             </div>
           ) : (
             <select
+              name="select"
               className="kzui-select-option"
               value={select}
               disabled={disabled}
               onChange={(e) => setSelect(e.target.value)}
             >
-              {options.map((language, index) => (
-                <option
-                  key={index}
-                  value={
-                    language === "Pick your favorite language" ? " " : language
-                  }
-                >
-                  {language === "Pick your favorite language"
-                    ? placeholder
-                    : language}
+              <option value="" disabled>
+                {placeholder}
+              </option>
+
+              {defaultOptions.map((language, index) => (
+                <option key={index} value={language}>
+                  {language}
                 </option>
               ))}
             </select>
+
           )}
         </div>
         {clear && (
@@ -139,11 +148,11 @@ const CustomSelect = ({
       </div>
       <div className="kzui-checkbox">
         <label className="kzui-cursor">
-          <input onClick={handleClearable} type="checkbox" />
+          <input name="clearable" onClick={handleClearable} type="checkbox" />
           <span>Clearable</span>
         </label>
         <label className="kzui-cursor">
-          <input
+          <input name=""
             onClick={(e) => setSearchable(e.target.checked)}
             type="checkbox"
           />
