@@ -166,7 +166,11 @@ const CustomSelect = ({
           <span className="kzui-indicator" aria-hidden="true">{menuOpen ? "▲" : "▼"}</span>
         </div>
         {menuOpen && !loading && (
-          <div className="kzui-language-sugges" role="listbox" aria-multiselectable={multi || undefined}>
+          <div
+  className="kzui-language-sugges animate-in fade-in-0 zoom-in-95 slide-in-from-top-2"
+  role="listbox"
+  aria-multiselectable={multi || undefined}
+>
             {filteredGroups.length === 0 ? (
               <p className="kzui-empty">No options</p>
             ) : filteredGroups.map((group) => (
