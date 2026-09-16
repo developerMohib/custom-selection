@@ -1,171 +1,216 @@
 import PropTypes from "prop-types";
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+const defaultOptions = ["Java", "Go", "C", "C#", "C++", "Rust", "JavaScript", "Python"];
+
+const getOptionLabel = (option) => (typeof option === "string" ? option : option.label);
+const getOptionValue = (option) =>
+  typeof option === "string" ? option : option.value;
+const isGroup = (option) => option && Array.isArray(option.options);
 
 const CustomSelect = ({
-  isClearable,
-  isSearchable,
-  isDisabled,
-  options,
+  isClearable = false,
+  isSearchable = false,
+  isDisabled = false,
+  isLoading = false,
+  options = defaultOptions,
   value,
-  placeholder = "Search...",
-  isGrouped,
-  isMulti,
+  placeholder = "Select...",
+  isGrouped = false,
+  isMulti = false,
   onChangeHandler,
+  onChange,
   onMenuOpen,
   onSearchHandler,
 }) => {
-  options = [
-    "Pick your favorite language",
-    "Java",
-    "Go",
-    "C",
-    "C#",
-    "C++",
-    "Rust",
-    "JavaScript",
-    "Python",
-  ];
-
-  const [select, setSelect] = useState("");
-  const [clear, setClear] = useState(false);
-  const [searchable, setSearchable] = useState(false);
-  const [disabled, setDisabled] = useState(false);
+  const containerRef = useRef(null);
+  const [clearable, setClearable] = useState(isClearable);
+  const [searchable, setSearchable] = useState(isSearchable);
+  const [disabled, setDisabled] = useState(isDisabled);
+  const [loading, setLoading] = useState(isLoading);
+  const [grouped, setGrouped] = useState(isGrouped);
+  const [multi, setMulti] = useState(isMulti);
+  const [selected, setSelected] = useState(() => value ?? (isMulti ? [] : null));
   const [searchText, setSearchText] = useState("");
-
-  const [group, setGroup] = useState(false);
-  const [showOptions, setShowOptions] = useState(false);
-
-  const handleClearable = (e) => {
-    setClear(e.target.checked);
-  };
-  const filtered = options?.filter((option) =>
-    option.toLowerCase().includes(searchText.toLowerCase())
-  );
-
-  const handleSelect = (language) => {
-    setSearchText(language);
-    setShowOptions(false);
-  };
-
-
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest(".dropdown-container")) {
-        setShowOptions(false);
-      }
+    if (value !== undefined) setSelected(value);
+  }, [value]);
+
+  useEffect(() => {
+    setClearable(isClearable);
+    setSearchable(isSearchable);
+    setDisabled(isDisabled);
+    setLoading(isLoading);
+    setGrouped(isGrouped);
+    setMulti(isMulti);
+  }, [isClearable, isDisabled, isGrouped, isLoading, isMulti, isSearchable]);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (!containerRef.current?.contains(event.target)) setMenuOpen(false);
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
+  const groups = useMemo(() => {
+    if (grouped) {
+      const optionGroups = options.filter(isGroup);
+      return optionGroups.length
+        ? optionGroups
+        : [{ label: "Languages", options: options.filter((option) => !isGroup(option)) }];
+    }
+    return [{ label: "", options: options.filter((option) => !isGroup(option)) }];
+  }, [grouped, options]);
 
+  const selectedValues = multi
+    ? Array.isArray(selected)
+      ? selected
+      : selected
+        ? [selected]
+        : []
+    : selected
+      ? [selected]
+      : [];
+  const filteredGroups = groups
+    .map((group) => ({
+      ...group,
+      options: group.options.filter((option) =>
+        getOptionLabel(option).toLowerCase().includes(searchText.toLowerCase())
+      ),
+    }))
+    .filter((group) => group.options.length > 0);
 
+  const emitChange = (nextValue) => {
+    setSelected(nextValue);
+    onChangeHandler?.(nextValue);
+    onChange?.(nextValue);
+  };
 
+  const openMenu = () => {
+    if (disabled || loading) return;
+    setMenuOpen(true);
+    onMenuOpen?.();
+  };
+
+  const handleSelect = (option) => {
+    if (option.isDisabled) return;
+    const optionValue = getOptionValue(option);
+    if (multi) {
+      const alreadySelected = selectedValues.some(
+        (item) => getOptionValue(item) === optionValue
+      );
+      emitChange(
+        alreadySelected
+          ? selectedValues.filter((item) => getOptionValue(item) !== optionValue)
+          : [...selectedValues, option]
+      );
+      setSearchText("");
+    } else {
+      emitChange(option);
+      setSearchText(getOptionLabel(option));
+      setMenuOpen(false);
+    }
+  };
 
   const handleClear = () => {
-    setSelect(" ");
+    emitChange(multi ? [] : null);
     setSearchText("");
   };
 
-  console.log("group ", group);
+  const handleSearch = (event) => {
+    const nextSearch = event.target.value;
+    setSearchText(nextSearch);
+    onSearchHandler?.(nextSearch);
+    setMenuOpen(true);
+  };
 
   return (
-    <>
-      <div className="kzui-select-div">
-        <div className="kzui-input-over">
-          {searchable ? (
-            <div>
+    <div className="kzui-demo">
+      <div className="kzui-select-div" ref={containerRef}>
+        <div className={`kzui-control ${disabled ? "is-disabled" : ""}`}>
+          <div className="kzui-value-container">
+            {multi && selectedValues.map((item) => (
+              <span className="kzui-chip" key={getOptionValue(item)}>
+                {getOptionLabel(item)}
+                <button type="button" onClick={() => handleSelect(item)} aria-label={`Remove ${getOptionLabel(item)}`}>
+                  x
+                </button>
+              </span>
+            ))}
+            {searchable ? (
               <input
-                type="text"
-                disabled={disabled}
+                aria-label="Search options"
+                type="search"
+                disabled={disabled || loading}
                 className="kzui-select-option"
-                value={searchText}
-                placeholder={placeholder}
-                onChange={(e) => {
-                  setSearchText(e.target.value);
-                  setShowOptions(true);
-                }}
-                onClick={() => setShowOptions(true)}
+                value={multi ? searchText : selected ? searchText : ""}
+                placeholder={selected && !multi ? getOptionLabel(selected) : placeholder}
+                onChange={handleSearch}
+                onFocus={openMenu}
               />
-              {showOptions && filtered?.length > 0 && (
-                <ul className="kzui-language-sugges">
-                  {filtered?.map((language, index) => (
-                    <li
-                      className="kzui-list-search"
-                      onClick={() => handleSelect(language)}
-                      key={index}
-                    >
-                      {language}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ) : (
-            <select
-              className="kzui-select-option"
-              value={select}
-              disabled={disabled}
-              onChange={(e) => setSelect(e.target.value)}
-            >
-              {options.map((language, index) => (
-                <option
-                  key={index}
-                  value={
-                    language === "Pick your favorite language" ? " " : language
-                  }
-                >
-                  {language === "Pick your favorite language"
-                    ? placeholder
-                    : language}
-                </option>
-              ))}
-            </select>
+            ) : (
+              <button type="button" className="kzui-select-button" disabled={disabled || loading} onClick={openMenu}>
+                {loading ? "Loading..." : selectedValues.length ? selectedValues.map(getOptionLabel).join(", ") : placeholder}
+              </button>
+            )}
+          </div>
+          {clearable && selectedValues.length > 0 && (
+            <button type="button" className="kzui-select__clear" disabled={disabled} onClick={handleClear} aria-label="Clear selection">
+              x
+            </button>
           )}
+          <span className="kzui-indicator" aria-hidden="true">{menuOpen ? "▲" : "▼"}</span>
         </div>
-        {clear && (
-          <button
-            disabled={disabled}
-            onClick={handleClear}
-            className="kzui-select__clear kzui-select__control"
-          >
-            X
-          </button>
+        {menuOpen && !loading && (
+          <div className="kzui-language-sugges" role="listbox" aria-multiselectable={multi || undefined}>
+            {filteredGroups.length === 0 ? (
+              <p className="kzui-empty">No options</p>
+            ) : filteredGroups.map((group) => (
+              <div key={group.label || "options"}>
+                {group.label && <div className="kzui-group-label">{group.label}</div>}
+                {group.options.map((option) => {
+                  const optionValue = getOptionValue(option);
+                  const isSelected = selectedValues.some((item) => getOptionValue(item) === optionValue);
+                  return (
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={isSelected}
+                      disabled={option.isDisabled}
+                      className={`kzui-list-search ${isSelected ? "is-selected" : ""}`}
+                      onClick={() => handleSelect(option)}
+                      key={optionValue}
+                    >
+                      {multi && <span className="kzui-checkbox-mark" aria-hidden="true">{isSelected ? "[x]" : "[ ]"}</span>}
+                      {getOptionLabel(option)}
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
         )}
       </div>
-      <div className="kzui-checkbox">
-        <label className="kzui-cursor">
-          <input onClick={handleClearable} type="checkbox" />
-          <span>Clearable</span>
-        </label>
-        <label className="kzui-cursor">
-          <input
-            onClick={(e) => setSearchable(e.target.checked)}
-            type="checkbox"
-          />
-          <span>Searchable</span>
-        </label>
-        <label className="kzui-cursor">
-          <input
-            onClick={(e) => setDisabled(e.target.checked)}
-            type="checkbox"
-          />
-          <span>Disabled</span>
-        </label>
-        <label className="kzui-cursor">
-          <input onClick={(e) => setGroup(e.target.checked)} type="checkbox" />
-          <span>Grouped</span>
-        </label>
-        <label className="kzui-cursor">
-          <input onClick={onChangeHandler} type="checkbox" />
-          <span>Multi</span>
-        </label>
+      <div className="kzui-checkbox" aria-label="Select options">
+        {["Clearable", "Searchable", "Disabled", "Loading", "Grouped", "Multi"].map((label) => (
+          <label className="kzui-cursor" key={label}>
+            <input
+              type="checkbox"
+              checked={{ Clearable: clearable, Searchable: searchable, Disabled: disabled, Loading: loading, Grouped: grouped, Multi: multi }[label]}
+              onChange={() => {
+                const setters = { Clearable: setClearable, Searchable: setSearchable, Disabled: setDisabled, Loading: setLoading, Grouped: setGrouped, Multi: setMulti };
+                setters[label]((currentValue) => !currentValue);
+              }}
+            />
+            <span>{label}</span>
+          </label>
+        ))}
       </div>
-    </>
+    </div>
   );
 };
 
@@ -173,12 +218,14 @@ CustomSelect.propTypes = {
   isClearable: PropTypes.bool,
   isSearchable: PropTypes.bool,
   isDisabled: PropTypes.bool,
+  isLoading: PropTypes.bool,
   options: PropTypes.array,
-  value: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.array]),
   placeholder: PropTypes.string,
   isGrouped: PropTypes.bool,
   isMulti: PropTypes.bool,
   onChangeHandler: PropTypes.func,
+  onChange: PropTypes.func,
   onMenuOpen: PropTypes.func,
   onSearchHandler: PropTypes.func,
 };
