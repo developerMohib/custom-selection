@@ -1,42 +1,65 @@
-# Custom Selection
+# Custom Selection Demo
 
-A small React custom selection component demo. It supports standard selection and searchable selection modes, with checkbox controls that let you change the component behavior while the app is running.
+This project is a small React + Vite demo for a custom dropdown/select component. It shows how a selection UI can support multiple states such as single select, multi-select, searchable dropdowns, grouped options, disabled mode, loading mode, and clearable values.
+
+The app is intentionally designed as a front-end demo, not as a production data layer. The options are defined locally inside the component, and the UI toggles are controlled by checkbox inputs placed below the select.
 
 ## Features
 
-- Select an option from a custom dropdown.
-- Search and filter options with a text input.
-- Clear the current selection with an `X` button.
-- Disable the selection control.
-- Show a loading state while options are unavailable.
-- Close the search suggestions by clicking outside the component.
-- Toggle the demo controls with checkboxes:
-	- Clearable
-	- Searchable
-	- Disabled
-	- Grouped
-	- Multi
+- Single-select behavior
+- Multi-select behavior with removable chips
+- Search/filter input for options
+- Clear selection using an X button
+- Disabled state
+- Loading state
+- Grouped option support
+- Click-outside close behavior
+- Demo controls that let you switch modes at runtime
 
-## Getting Started
+## Default data
+
+The component starts with this list:
+
+```js
+["Java", "Go", "C", "C#", "C++", "Rust", "JavaScript", "Python"]
+```
+
+It also supports option objects like:
+
+```js
+{ value: "javascript", label: "JavaScript", isDisabled: false }
+```
+
+And grouped data like:
+
+```js
+{ label: "Languages", options: [...] }
+```
+
+## Getting started
 
 ### Requirements
 
-- Node.js 18 or later
+- Node.js 18+
 - npm
 
-### Installation
+### Install dependencies
 
 ```bash
 npm install
 ```
 
-### Start the development server
+### Run the app in development mode
 
 ```bash
 npm run dev
 ```
 
-Open the local URL printed by Vite, usually `http://localhost:5173`.
+Then open the local URL shown by Vite in the terminal, usually:
+
+```text
+http://localhost:5173
+```
 
 ### Create a production build
 
@@ -56,74 +79,63 @@ npm run preview
 npm run lint
 ```
 
-## How It Works
-
-The component starts in regular select mode. Enable **Searchable** to switch to a text input. Typing filters the available languages using a case-insensitive search, and selecting a suggestion closes the list. Search input changes are passed to `onSearchHandler` when supplied.
-
-Enable **Clearable** to show the clear button. The button resets the current search text and selection. Enable **Disabled** to prevent interaction with the selection control and clear button. **Loading** displays a loading label and temporarily prevents the menu from opening.
-
-Enable **Multi** to select more than one option. Selected values are displayed as removable chips. **Grouped** renders grouped option data and creates a default `Languages` group for the built-in flat list.
-
-The current option list is defined in `src/App.jsx`:
-
-```js
-[
-	"Java",
-	"Go",
-	"C",
-	"C#",
-	"C++",
-	"Rust",
-	"JavaScript",
-	"Python",
-]
-```
-
-## Project Structure
+## Project structure
 
 ```text
 .
 ├── index.html
 ├── package.json
 ├── vite.config.js
+├── README.md
 └── src
-		├── App.jsx       # Custom select component and demo controls
-		├── App.css       # Component styles
-		├── index.css     # Global styles
-		└── main.jsx      # React entry point
+    ├── App.jsx
+    ├── App.css
+    ├── index.css
+    └── main.jsx
 ```
 
-## Component API
+## Component behavior
 
-`CustomSelect` accepts these props:
+The main component lives in [src/App.jsx](src/App.jsx). It exports a `CustomSelect` component that accepts props such as:
 
-| Prop | Type | Purpose |
-| --- | --- | --- |
-| `isClearable` | `boolean` | Clear button state |
-| `isSearchable` | `boolean` | Search mode state |
-| `isDisabled` | `boolean` | Disabled state |
-| `isLoading` | `boolean` | Loading state |
-| `options` | `array` | String options, option objects, or groups |
-| `value` | `string`, object, or array | Current selected value(s) |
-| `placeholder` | `string` | Input/select placeholder |
-| `isGrouped` | `boolean` | Grouped options state |
-| `isMulti` | `boolean` | Multi-select state |
-| `onChangeHandler` | `function` | Selection change callback |
-| `onChange` | `function` | React-select-style selection callback |
-| `onMenuOpen` | `function` | Menu-open callback |
-| `onSearchHandler` | `function` | Search input callback |
+- `isClearable`
+- `isSearchable`
+- `isDisabled`
+- `isLoading`
+- `options`
+- `value`
+- `placeholder`
+- `isGrouped`
+- `isMulti`
+- `onChangeHandler`
+- `onChange`
+- `onMenuOpen`
+- `onSearchHandler`
 
-Option objects follow the same basic shape as `react-select`:
+### Demo controls
 
-```js
-{ value: "javascript", label: "JavaScript", isDisabled: false }
-```
+The app includes checkboxes below the selector that toggle the following states:
 
-Grouped options use `{ label, options }`. `onChange` and `onChangeHandler` receive the selected option, an array in multi mode, or `null` when cleared. `onMenuOpen` runs when the menu opens.
+- Clearable
+- Searchable
+- Disabled
+- Loading
+- Grouped
+- Multi
 
-## Technologies
+This makes it easy to test the component behavior without modifying code.
+
+## Important note
+
+This is a demo component built for learning and UI experimentation. It is not built for large-scale production use with very large option lists, because it uses local filtering in the browser and keeps data in memory. For a real production app with thousands or millions of records, you would normally move the search and filtering to a backend API and add pagination or virtualization.
+
+## Tech stack
 
 - React 18
 - Vite
 - PropTypes
 - ESLint
+
+## Summary
+
+This app demonstrates a custom dropdown/select component in a simple, interactive way. It is useful for learning component state patterns, custom menu behavior, and option filtering, but it should be treated as a demo implementation rather than a full production-ready data-driven selector.
